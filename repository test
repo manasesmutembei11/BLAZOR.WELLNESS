@@ -66,3 +66,51 @@ namespace App1.Repositories
 
     }
 }
+
+
+
+TODO REPOSITORY
+
+public class TodoRepository : ITodoRepository
+{
+    private readonly ApplicationDbContext _dbContext;
+
+    public TodoRepository(ApplicationDbContext dbContext)
+    {
+        _dbContext = dbContext;
+    }
+
+    public async Task<IEnumerable<TodoItem>> GetTodoItems()
+    {
+        return await _dbContext.TodoItems.ToListAsync();
+    }
+
+    public async Task<TodoItem> GetTodoItemById(int id)
+    {
+        return await _dbContext.TodoItems.FindAsync(id);
+    }
+
+    public async Task<int> AddTodoItem(TodoItem todoItem)
+    {
+        _dbContext.TodoItems.Add(todoItem);
+        await _dbContext.SaveChangesAsync();
+        return todoItem.Id;
+    }
+
+    public async Task UpdateTodoItem(TodoItem todoItem)
+    {
+        _dbContext.Entry(todoItem).State = EntityState.Modified;
+        await _dbContext.SaveChangesAsync();
+    }
+
+    public async Task DeleteTodoItem(int id)
+    {
+        var todoItem = await _dbContext.TodoItems.FindAsync(id);
+        if (todoItem != null)
+        {
+            _dbContext.TodoItems.Remove(todoItem);
+            await _dbContext.SaveChangesAsync();
+        }
+    }
+}
+
